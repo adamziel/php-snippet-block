@@ -1,0 +1,26 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "php-snippet-block/php-snippet",
+	"version": "1.0.0",
+	"title": "PHP Snippet",
+	"category": "text",
+	"icon": "editor-code",
+	"description": "Add an editable PHP example that runs in the reader's browser with WordPress Playground.",
+	"keywords": [ "php", "code", "run", "playground" ],
+	"textdomain": "php-snippet-block",
+	"attributes": {
+		"content": {
+			"type": "string",
+			"source": "text",
+			"selector": "code",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"editorScript": "file:./editor.js",
+	"viewScriptModule": "file:./view.js",
+	"style": "file:./style.css"
+}

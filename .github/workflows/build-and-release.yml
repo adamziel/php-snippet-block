@@ -1,0 +1,70 @@
+name: Build and release
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Check PHP syntax
+        run: |
+          php -l php-snippet-block.php
+          php -l editor.asset.php
+
+      - name: Check JavaScript syntax
+        run: |
+          node --check editor.js
+          node --check view.js
+
+      - name: Check block metadata
+        run: jq --exit-status . block.json > /dev/null
+
+      - name: Build WordPress.org ZIP
+        run: ./build-release.sh
+
+      - name: Run WordPress Plugin Check
+        uses: wordpress/plugin-check-action@v1.1.9
+        with:
+          build-dir: ./dist/php-snippet-block
+
+      - name: Store WordPress.org ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: php-snippet-block-${{ github.sha }}
+          path: dist/php-snippet-block.zip
+          if-no-files-found: error
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download WordPress.org ZIP
+        uses: actions/download-artifact@v4
+        with:
+          name: php-snippet-block-${{ github.sha }}
+          path: release
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            "release/php-snippet-block.zip#WordPress.org upload ZIP" \
+            --repo "$GITHUB_REPOSITORY" \
+            --verify-tag \
+            --generate-notes \
+            --title "PHP Snippet Block ${GITHUB_REF_NAME#v}"

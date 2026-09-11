@@ -14,7 +14,7 @@ jobs:
 
     steps:
       - name: Check out source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Check PHP syntax
         run: |
@@ -38,7 +38,7 @@ jobs:
           build-dir: ./dist/php-snippet-block
 
       - name: Store WordPress.org ZIP
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: php-snippet-block-${{ github.sha }}
           path: dist/php-snippet-block.zip
@@ -53,7 +53,7 @@ jobs:
 
     steps:
       - name: Download WordPress.org ZIP
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: php-snippet-block-${{ github.sha }}
           path: release
